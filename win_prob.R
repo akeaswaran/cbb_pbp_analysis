@@ -8,8 +8,9 @@ data("dict")
 generate_league_pbp <- function(team_ids) {
     table = data.table()
     message(paste("Staring to load PbP for number of teams: ", length(team_ids), sep = ""))
-    for(name in team_ids) {
-        message(paste("Getting PbPs for team: ", name, sep = ""))
+    for(i in 1:length(team_ids)) {
+        name = team_ids[i]
+        message(paste0("[",i,"/",length(team_ids),"]"," Getting PbPs for team: ", name, sep = ""))
         games = get_game_ids(name)
         for(game in games) {
             box_score = generate_box_score(game_id = game)
@@ -18,14 +19,17 @@ generate_league_pbp <- function(team_ids) {
             }
         }
     }
-    message(paste("-----\nDone getting PbP for number of teams: ", length(team_ids), sep = ""))
+    message(paste0("-----\n","[",i,"/",length(team_ids),"]"," Done getting PbP for number of teams: ", length(team_ids), sep = ""))
     return(table)
 }
 
+if (!exists("total")) {
+    all_teams = dplyr::pull(ids, team)
+    total <- generate_league_pbp(all_teams[1:15])
+}
+
 generate_win_prob <- function(gameId) {
-    if (!exists("proj_score_diff") || !exists("linear_model") || !exists("total")) {
-        all_teams = dplyr::pull(ids, team)
-        total <- generate_league_pbp(all_teams[1:15])
+    if (!exists("proj_score_diff") || !exists("linear_model")) {
 
         message(paste("Correlation: ",cor(total$FFDiff, total$PointDiff),sep=""))
 
@@ -71,4 +75,4 @@ generate_win_prob <- function(gameId) {
     message(paste('Proj win prob for FF Max team: ', pnorm(WinProb, mu, std), sep=""))
 }
 
-generate_win_prob(401168219)
+generate_win_prob(401168157)
