@@ -7,6 +7,21 @@ data("dict")
 shot_types = c('Jumper','Dunk','Layup','Three Point Jumper')
 rebound_types = c('Defensive Rebound','Offensive Rebound')
 
+calculate_four_factors_sum <- function(box_row) {
+    shoot_factor = 0.4
+    turnover_factor = 0.25
+    rebound_factor = 0.2
+    ft_factor = 0.15
+
+    shoot = (shoot_factor * box_row$eFG)
+    turnover = (turnover_factor * box_row$TOV)
+    rebound = ((rebound_factor / 2) * box_row$ORB) + ((rebound_factor / 2) * box_row$DRB)
+    fts = (ft_factor * box_row$FTpFGA)
+
+    weighted_sum = sum(shoot, turnover, rebound, fts)
+    return(weighted_sum)
+}
+
 analyze_team_plays <- function(team, pbp) {
     message(paste("Beginning game analysis for team: ", team, sep = ""))
     team_roster <- get_roster(team)
@@ -117,6 +132,10 @@ generate_box_score <- function(game_id, home_team = NULL, away_team = NULL) {
 
     avg_win_prob <- average_win_prob(game_id) * 100
     game_stats$AvgWinProb <- c(avg_win_prob, 100 - avg_win_prob)
+
+    ff_home = calculate_four_factors_sum(selected_team_stats) - calculate_four_factors_sum(selected_opponent_stats)
+    ff_away = calculate_four_factors_sum(selected_opponent_stats) - calculate_four_factors_sum(selected_team_stats)
+    game_stats$FFDiff <- c(ff_home, ff_away)
 
     return(game_stats)
 }
