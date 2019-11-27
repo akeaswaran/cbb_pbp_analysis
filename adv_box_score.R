@@ -9,7 +9,7 @@ rebound_types = c('Defensive Rebound','Offensive Rebound')
 
 calculate_four_factors_sum <- function(box_row) {
     shoot_factor = 0.4
-    turnover_factor = 0.25
+    turnover_factor = -0.25
     rebound_factor = 0.2
     ft_factor = 0.15
 
