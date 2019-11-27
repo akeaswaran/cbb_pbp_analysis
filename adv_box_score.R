@@ -32,34 +32,34 @@ analyze_team_plays <- function(team, pbp) {
     }
     team_roster <- get_roster(cleaned_team_name$ESPN)
     team_plays <- pbp %>% filter(grepl(paste(team_roster$name, collapse="|"), description))
-    
+
     team_shots <- team_plays %>% filter(grepl(paste(shot_types, collapse="|"), description))
     made_shots <- team_shots %>% filter(grepl('made', description))
-    
+
     team_3pt <- team_shots %>% filter(grepl('Three Point', description))
     made_3pt <- team_3pt %>% filter(grepl('made', description))
-    
+
     team_rebounds <- team_plays %>% filter(grepl(paste(rebound_types, collapse="|"), description))
     off_rebounds <- team_rebounds %>% filter(grepl('Offensive', description))
-    
+
     team_fts <- team_plays %>% filter(grepl('Free Throw', description))
     made_fts <- team_fts %>% filter(grepl('made', description))
-    
+
     team_tos <- team_plays %>% filter(grepl('Turnover', description))
-    
+
     team_assists <- team_plays %>% filter(grepl('Assist', description))
     team_steals <- team_plays %>% filter(grepl('Steal', description))
-    
+
     team_pts <- (nrow(made_shots) - nrow(made_3pt)) * 2.0 + nrow(made_3pt) * 3.0 + nrow(made_fts)
-    
+
     true_shooting_pct <- 100 * (team_pts / (2 * (nrow(team_shots) + 0.44 * nrow(team_fts))))
-    
+
     eff_fg_pct <- 100 * ((nrow(made_shots) + (0.5 * nrow(made_3pt))) / nrow(team_shots))
-    
+
     tov_pct <- 100 * (nrow(team_tos) / (nrow(team_shots) + (0.44 * nrow(team_fts)) + nrow(team_tos)))
-    
+
     ft_to_fga <- (nrow(made_fts) / nrow(team_shots))
-    
+
     table = data.table(
         Name = c(team),
         # plays = nrow(team_plays),
@@ -142,5 +142,5 @@ generate_box_score <- function(game_id, home_team = NULL, away_team = NULL) {
     return(game_stats)
 }
 
-box <- generate_box_score(game_id = 401168216)
+# box <- generate_box_score(game_id = 401168216)
 
