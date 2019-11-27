@@ -24,7 +24,6 @@ calculate_four_factors_sum <- function(box_row) {
 
 analyze_team_plays <- function(team, pbp) {
     message(paste("Beginning game analysis for team: ", team, sep = ""))
-    team_roster <- get_roster(team)
 
     cleaned_team_name <- dict[which(dict$ESPN_PBP == team), ]
     if (is.null(cleaned_team_name) || length(cleaned_team_name$ESPN) == 0) {
@@ -133,9 +132,12 @@ generate_box_score <- function(game_id, home_team = NULL, away_team = NULL) {
     avg_win_prob <- average_win_prob(game_id) * 100
     game_stats$AvgWinProb <- c(avg_win_prob, 100 - avg_win_prob)
 
-    ff_home = calculate_four_factors_sum(selected_team_stats) - calculate_four_factors_sum(selected_opponent_stats)
-    ff_away = calculate_four_factors_sum(selected_opponent_stats) - calculate_four_factors_sum(selected_team_stats)
-    game_stats$FFDiff <- c(ff_home, ff_away)
+    ff_home = calculate_four_factors_sum(selected_team_stats)
+    ff_away = calculate_four_factors_sum(selected_opponent_stats)
+    game_stats$FFSum <- c(ff_home, ff_away)
+    game_stats$FFDiff <- c(ff_home - ff_away, ff_away - ff_home)
+
+    game_stats$PointDiff <- c(selected_team_stats$Points - selected_opponent_stats$Points, selected_opponent_stats$Points - selected_team_stats$Points)
 
     return(game_stats)
 }
