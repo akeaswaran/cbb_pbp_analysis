@@ -6,6 +6,7 @@ shot_types = c('Jumper','Dunk','Layup','Three Point Jumper')
 rebound_types = c('Defensive Rebound','Offensive Rebound')
 
 analyze_team_plays <- function(team, pbp) {
+    message(paste("Beginning game analysis for team: ", team, sep = ""))
     team_roster <- get_roster(team)
     team_plays <- pbp %>% filter(grepl(paste(team_roster$name, collapse="|"), description))
     
@@ -59,40 +60,53 @@ analyze_team_plays <- function(team, pbp) {
         FTpFGA = ft_to_fga,
         AssistRate = 100 * (nrow(team_assists) / nrow(team_shots))
     )
-    
+    message(paste("Completed game analysis for team: ", team, sep = ""))
     return(table)
 }
 
-generate_box_score <- function(game_id, home_team, away_team) {
+generate_box_score <- function(game_id, home_team = NULL, away_team = NULL) {
+    if (is.null(game_id)) {
+        return(NULL)
+    }
     plays <- get_pbp_game(game_id)
-    selected_team <- home_team
-    selected_opponent <- away_team
-    
+    if (is.null(plays) || nrow(plays) == 0) {
+        return(NULL)
+    }
+
+    first_play = first(plays)
+    selected_team <- ifelse(is.null(home_team), first_play$home, home_team)
+    selected_opponent <- ifelse(is.null(away_team), first_play$away, away_team)
+
     selected_team_stats <- analyze_team_plays(selected_team, plays)
     selected_opponent_stats <- analyze_team_plays(selected_opponent, plays)
-    
+
     game_stats = rbind(selected_team_stats, selected_opponent_stats)
-    
+
     sel_team_stat_pack = (selected_team_stats$FGM + (0.4 * selected_team_stats$FTA) - ((1.07 * (selected_team_stats$ORB / (selected_team_stats$ORB + selected_opponent_stats$DRB))) * (selected_team_stats$FGA - selected_team_stats$FGM)) + selected_team_stats$TO)
     sel_opp_stat_pack = (selected_opponent_stats$FGM + (0.4 * selected_opponent_stats$FTA) - ((1.07 * (selected_opponent_stats$ORB / (selected_opponent_stats$ORB + selected_team_stats$DRB))) * (selected_opponent_stats$FGA - selected_opponent_stats$FGM)) + selected_opponent_stats$TO)
-    
-    game_stats$possessions = round(0.5 * (sel_team_stat_pack + sel_opp_stat_pack))
-    game_stats$PPP = game_stats$points / game_stats$possessions
-    
+
+    game_stats$Possessions = round(0.5 * (sel_team_stat_pack + sel_opp_stat_pack))
+    game_stats$PPP = game_stats$Points / game_stats$Possessions
+    game_stats$PPM = game_stats$Points / (max(plays$secs_remaining_absolute) / 60)
+
     sel_team_orb = 100 * (selected_team_stats$ORB / (selected_team_stats$ORB + selected_opponent_stats$DRB))
     sel_team_drb = 100 * (selected_team_stats$DRB / (selected_team_stats$DRB + selected_opponent_stats$ORB))
-    
+
     sel_opp_orb = 100 * (selected_opponent_stats$ORB / (selected_opponent_stats$ORB + selected_team_stats$DRB))
     sel_opp_drb = 100 * (selected_opponent_stats$DRB / (selected_opponent_stats$DRB + selected_team_stats$ORB))
-    
+
     game_stats$ORBP = c(sel_team_orb,sel_opp_orb)
     game_stats$DRBP = c(sel_team_drb,sel_opp_drb)
-    
-    game_stats$StealRate = 100 * (game_stats$steals / game_stats$possessions)
-    
-    game_stats$BCI = (game_stats$assists + game_stats$steals) / game_stats$TO
-    
+
+    game_stats$StealRate = 100 * (game_stats$Steals / game_stats$Possessions)
+
+    game_stats$BCI = (game_stats$Assists + game_stats$Steals) / game_stats$TO
+
+    avg_win_prob <- average_win_prob(game_id) * 100
+    game_stats$AvgWinProb <- c(avg_win_prob, 100 - avg_win_prob)
+
     return(game_stats)
 }
 
-box <- generate_box_score(game_id = 401168216, home_team = 'Georgia Tech', away_team = 'Arkansas')
+box <- generate_box_score(game_id = 401168216)
+
