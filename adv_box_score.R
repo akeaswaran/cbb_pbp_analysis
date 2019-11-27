@@ -1,6 +1,8 @@
 library(ncaahoopR)
 library(stringr)
 library(data.table)
+data("ids")
+data("dict")
 
 shot_types = c('Jumper','Dunk','Layup','Three Point Jumper')
 rebound_types = c('Defensive Rebound','Offensive Rebound')
@@ -8,6 +10,13 @@ rebound_types = c('Defensive Rebound','Offensive Rebound')
 analyze_team_plays <- function(team, pbp) {
     message(paste("Beginning game analysis for team: ", team, sep = ""))
     team_roster <- get_roster(team)
+
+    cleaned_team_name <- dict[which(dict$ESPN_PBP == team), ]
+    if (is.null(cleaned_team_name) || length(cleaned_team_name$ESPN) == 0) {
+        message(paste("Bailing out, could not find roster information for ", team, sep = ""))
+        return(NULL)
+    }
+    team_roster <- get_roster(cleaned_team_name$ESPN)
     team_plays <- pbp %>% filter(grepl(paste(team_roster$name, collapse="|"), description))
     
     team_shots <- team_plays %>% filter(grepl(paste(shot_types, collapse="|"), description))
@@ -79,6 +88,10 @@ generate_box_score <- function(game_id, home_team = NULL, away_team = NULL) {
 
     selected_team_stats <- analyze_team_plays(selected_team, plays)
     selected_opponent_stats <- analyze_team_plays(selected_opponent, plays)
+
+    if (is.null(selected_team_stats) || is.null(selected_opponent_stats)) {
+        return(NULL)
+    }
 
     game_stats = rbind(selected_team_stats, selected_opponent_stats)
 
