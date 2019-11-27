@@ -14,40 +14,61 @@ generate_league_pbp <- function(team_ids) {
         for(game in games) {
             box_score = generate_box_score(game_id = game)
             if (!is.null(box_score)) {
-                table = rbind(table, select(box_score, FFDiff, AvgWinProb))
+                table = rbind(table, select(box_score, FFDiff, PointDiff))
             }
         }
     }
-    message(paste("Done getting PbP for number of teams: ", length(team_ids), sep = ""))
+    message(paste("-----\nDone getting PbP for number of teams: ", length(team_ids), sep = ""))
     return(table)
 }
 
-all_teams = dplyr::pull(ids, team)
-total <- generate_league_pbp(all_teams[1:10])
+generate_win_prob <- function(gameId) {
+    if (!exists("proj_score_diff") || !exists("linear_model") || !exists("total")) {
+        all_teams = dplyr::pull(ids, team)
+        total <- generate_league_pbp(all_teams[1:15])
 
-# scatter.smooth(x=total$FFDiff, y=total$AvgWinProb, main="Four Factors Diff Correlated to Win Prob")
+        message(paste("Correlation: ",cor(total$FFDiff, total$PointDiff),sep=""))
 
-# cor(total$FFDiff, total$AvgWinProb) # correlation
-set.seed(100)  # setting seed to reproduce results of random sampling
-trainingRowIndex <- sample(1:nrow(total), 0.8*nrow(total))
-trainingData <- total[trainingRowIndex, ]  # model training data
-testData  <- total[-trainingRowIndex, ]   # test data
+        set.seed(100)  # setting seed to reproduce results of random sampling
+        trainingRowIndex <- sample(1:nrow(total), 0.8*nrow(total))
+        trainingData <- total[trainingRowIndex, ]  # model training data
+        testData  <- total[-trainingRowIndex, ]   # test data
 
-lmMod <- lm(AvgWinProb ~ FFDiff, data=trainingData)  # build the model
-distPred <- predict(lmMod, testData)  # predict distance
+        linear_model <- lm(PointDiff ~ FFDiff, data=trainingData)  # build the model
+        distPred <- predict(linear_model, testData)  # predict distance
+        message("Linear Regression model summary: ")
+        summary(linear_model)
 
-summary(lmMod)
+        proj_score_diff <- data.frame(cbind(actuals=testData$PointDiff, predicteds=distPred))  # make actuals_predicteds dataframe.
+        message("Correlation accuracy: ")
+        cor(proj_score_diff)
+        head(proj_score_diff)
 
-actuals_preds <- data.frame(cbind(actuals=testData$AvgWinProb, predicteds=distPred))  # make actuals_predicteds dataframe.
-correlation_accuracy <- cor(actuals_preds)  # 82.7%
-head(actuals_preds)
+        # Min-Max Accuracy Calculation
+        message(paste("Min/Max Accuracy: ", mean(apply(proj_score_diff, 1, min) / apply(proj_score_diff, 1, max)), sep=""))
 
-# Min-Max Accuracy Calculation
-min_max_accuracy <- mean(apply(actuals_preds, 1, min) / apply(actuals_preds, 1, max))
-# => 38.00%, min_max accuracy
+        # MAPE Calculation
+        message(paste("MAPE: ", mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))/proj_score_diff$actuals), sep=""))
+    }
 
-# MAPE Calculation
-mape <- mean(abs((actuals_preds$predicteds - actuals_preds$actuals))/actuals_preds$actuals)
+    box_score = generate_box_score(game_id = gameId)
 
-# WinProb <- (max(box$FFDiff) * 2.9498) + 50
-#message(paste('Winning team had exp win prob of: ', predict(linearMod, max(box$FFDiff)), sep=""))
+    # Take projected score diff and calculate win prob
+    mu = mean(proj_score_diff$predicteds)
+    std = sd(proj_score_diff$predicteds)
+    #actuals_preds$WinProb = pnorm(actuals_preds$predicteds, mu, std)
+    #actuals_preds$FFDiff = testData$FFDiff
+
+    model_summary <- summary(linear_model)
+    model_coeffs <- model_summary$coefficients
+    beta.slope <- model_coeffs["FFDiff", "Estimate"]
+    beta.intercept <- model_coeffs["(Intercept)", "Estimate"]
+
+    WinProb <- (max(box_score$FFDiff) * beta.slope) + beta.intercept
+    ff_max_team = box_score[which(max(box_score$FFDiff) == box_score$FFDiff)]
+    message(paste('FF Max team: ', ff_max_team$Name))
+    message(paste('FF Max team should have won by: ', WinProb, sep=""))
+    message(paste('Proj win prob for FF Max team: ', pnorm(WinProb, mu, std), sep=""))
+}
+
+generate_win_prob(401168219)
