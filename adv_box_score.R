@@ -38,12 +38,12 @@ analyze_team_plays <- function(team, pbp) {
     ft_to_fga <- (nrow(made_fts) / nrow(team_shots))
     
     table = data.table(
-        name = c(team),
-        plays = nrow(team_plays),
-        points = team_pts,
+        Name = c(team),
+        # plays = nrow(team_plays),
+        Points = team_pts,
         PPS = team_pts / nrow(team_shots),
-        assists = nrow(team_assists),
-        steals = nrow(team_steals),
+        Assists = nrow(team_assists),
+        Steals = nrow(team_steals),
         FGA = nrow(team_shots),
         FGM = nrow(made_shots),
         TPA = nrow(team_3pt),
