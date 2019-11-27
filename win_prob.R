@@ -1,6 +1,7 @@
 library(ncaahoopR)
 library(stringr)
 library(data.table)
+source("./adv_box_score.R")
 
 data("ids")
 data("dict")
@@ -75,4 +76,4 @@ generate_win_prob <- function(gameId) {
     message(paste('Proj win prob for FF Max team: ', pnorm(WinProb, mu, std), sep=""))
 }
 
-generate_win_prob(401168157)
+# generate_win_prob(401168157)
