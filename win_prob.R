@@ -6,27 +6,41 @@ source("./adv_box_score.R")
 data("ids")
 data("dict")
 
-generate_league_pbp <- function(team_ids) {
-    table = data.table()
+generate_league_pbp <- function(team_ids, total_df = NULL) {
+    if (is.null(total_df)) {
+        total_df = data.table()
+    }
     message(paste("Staring to load PbP for number of teams: ", length(team_ids), sep = ""))
     for(i in 1:length(team_ids)) {
         name = team_ids[i]
-        message(paste0("[",i,"/",length(team_ids),"]"," Getting PbPs for team: ", name, sep = ""))
-        games = get_game_ids(name)
-        for(game in games) {
-            box_score = generate_box_score(game_id = game)
-            if (!is.null(box_score)) {
-                table = rbind(table, select(box_score, FFDiff, PointDiff))
+        if (name != 'Campbell' || name != 'Coastal Carolina') {
+            message(paste0("[",i,"/",length(team_ids),"]"," Getting PbPs for team: ", name, sep = ""))
+            games = get_game_ids(name)
+            for(game in games) {
+                box_score = generate_box_score(game_id = game)
+                if (!is.null(box_score)) {
+                    total_df = rbind(total_df, select(box_score, FFDiff, PointDiff))
+                }
             }
+            message(paste0("[",i,"/",length(team_ids),"]"," Done getting PbPs for team: ", name, sep = ""))
+        } else {
+            message(paste0("[",i,"/",length(team_ids),"]"," Skipping PbP for team: ", name, sep = ""))
         }
     }
     message(paste0("-----\n","[",i,"/",length(team_ids),"]"," Done getting PbP for number of teams: ", length(team_ids), sep = ""))
-    return(table)
+    return(total_df)
 }
-
+# last_team_index = 25
 if (!exists("total")) {
     all_teams = dplyr::pull(ids, team)
-    total <- generate_league_pbp(all_teams[1:15])
+    interval = 50
+    if (!exists("last_team_index")) {
+        last_team_index = 1
+    }
+    end = (min(last_team_index+interval, length(all_teams)))
+    range = last_team_index:end
+    generate_league_pbp(all_teams[range], total)
+    last_team_index = end
 }
 
 generate_win_prob <- function(gameId) {
