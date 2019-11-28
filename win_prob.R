@@ -11,7 +11,7 @@ generate_league_pbp <- function(team_ids) {
     message(paste("Staring to load PbP for number of teams: ", length(team_ids), sep = ""))
     for(i in 1:length(team_ids)) {
         name = team_ids[i]
-        if (name != 'Campbell' && name != 'C. Carolina' && name != 'Delaware State' && name != 'Charleston So') {
+        if (name != 'Campbell' && name != 'C. Carolina' && name != 'Delaware State' && name != 'Charleston So' && name != 'Columbia') {
             message(paste0("[",i,"/",length(team_ids),"]"," Getting PbPs for team: ", name, sep = ""))
             games = get_game_ids(name)
             for(game in games) {
@@ -36,7 +36,7 @@ if (!exists("last_team_index")) {
 
 generate_pbp_data <- function() {
     all_teams = dplyr::pull(ids, team)
-    interval = 75
+    interval = 60
     end = (min(last_team_index+interval - 1, length(all_teams) - 1))
     range = last_team_index:end
     last_team_index = end
@@ -69,10 +69,10 @@ if (!exists("proj_score_diff") || !exists("linear_model")) {
     head(proj_score_diff)
 
     # Min-Max Accuracy Calculation
-    message(paste("Min/Max Accuracy: ", mean(apply(proj_score_diff, 1, min) / apply(proj_score_diff, 1, max)), sep=""))
+    # message(paste("Min/Max Accuracy: ", mean(apply(proj_score_diff, 1, min) / apply(proj_score_diff, 1, max)), sep=""))
 
     # MAPE Calculation
-    message(paste("MAPE: ", mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))/proj_score_diff$actuals), sep=""))
+    # message(paste("MAPE: ", mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))/proj_score_diff$actuals), sep=""))
 }
 
 generate_win_prob <- function(espn_game_id) {
