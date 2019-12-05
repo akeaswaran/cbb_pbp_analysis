@@ -26,7 +26,7 @@ generate_league_pbp <- function(team_ids) {
         }
     }
     message(paste0("-----\n","[",i,"/",length(team_ids),"]"," Done getting PbP for number of teams: ", length(team_ids), sep = ""))
-    message(paste0("-----\n","[",i,"/",length(team_ids),"]"," Parsed ", length(total_df)," records", sep = ""))
+    message(paste0("-----\n","[",i,"/",length(team_ids),"]"," Parsed ", length(total_df$FFDiff)," records", sep = ""))
     return(total_df)
 }
 
