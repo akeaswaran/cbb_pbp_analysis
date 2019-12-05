@@ -36,7 +36,7 @@ if (!exists("last_team_index")) {
 
 generate_pbp_data <- function() {
     all_teams = dplyr::pull(ids, team)
-    interval = 60
+    interval = 50
     end = (min(last_team_index+interval - 1, length(all_teams) - 1))
     range = last_team_index:end
     last_team_index = end
