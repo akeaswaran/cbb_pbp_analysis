@@ -69,10 +69,16 @@ if (!exists("proj_score_diff") || !exists("linear_model")) {
     head(proj_score_diff)
 
     # Min-Max Accuracy Calculation
-    # message(paste("Min/Max Accuracy: ", mean(apply(proj_score_diff, 1, min) / apply(proj_score_diff, 1, max)), sep=""))
+    message(paste("Min/Max Accuracy: ", mean(apply(proj_score_diff, 1, min) / apply(proj_score_diff, 1, max)), sep=""))
+
+    # MAE calculation
+    message(paste("MAE: ", mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))), sep=""))
+
+    # MdAE calculation
+    message(paste("MdAE: ", median(abs((proj_score_diff$predicteds - proj_score_diff$actuals))), sep=""))
 
     # MAPE Calculation
-    # message(paste("MAPE: ", mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))/proj_score_diff$actuals), sep=""))
+    message(paste("MAPE: ", mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))/proj_score_diff$actuals), sep=""))
 }
 
 generate_win_prob <- function(espn_game_id) {
