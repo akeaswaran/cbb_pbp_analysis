@@ -104,4 +104,4 @@ generate_win_prob <- function(espn_game_id) {
     message(paste('Proj win prob for FF Max team: ', pnorm(WinProb, mu, std), sep=""))
 }
 
-# generate_win_prob(espn_game_id = 401168157)
+generate_win_prob(espn_game_id = 401168239)
