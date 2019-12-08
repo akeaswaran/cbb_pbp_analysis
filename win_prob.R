@@ -12,13 +12,17 @@ generate_league_pbp <- function(team_ids) {
     message(paste("Staring to load PbP for number of teams: ", length(team_ids), sep = ""))
     for(i in 1:length(team_ids)) {
         name = team_ids[i]
-        if (name != 'Central Arkansas' && name != 'Columbia' && name != 'High Point' && name != 'Duquesne') {
+        if (name != 'Central Arkansas' && name != 'Columbia' && name != 'High Point' && name != 'Duquesne'&& name != 'Lafayette' && name != 'Lehigh') {
             message(paste0("[",i,"/",length(team_ids),"]"," Getting PbPs for team: ", name, sep = ""))
             games = get_game_ids(name)
             for(game in games) {
-                box_score = generate_box_score(game_id = game)
-                if (!is.null(box_score) && !any(box_score$GameID[0]==total_df$GameID)) {
-                    total_df = rbind(total_df, select(box_score, GameID, FFDiff, PointDiff))
+                if (!any(game==total_df$GameID)) {
+                    box_score = generate_box_score(game_id = game)
+                    if (!is.null(box_score)) {
+                        total_df = rbind(total_df, select(box_score, GameID, FFDiff, PointDiff))
+                    }
+                } else {
+                    message(paste0("[",i,"/",length(team_ids),"]"," Already parsed GameID ",game,", skipping",sep=""))
                 }
             }
             message(paste0("[",i,"/",length(team_ids),"]"," Done getting PbPs for team: ", name, sep = ""))
@@ -97,8 +101,8 @@ generate_win_prob <- function(espn_game_id) {
     # MdAE calculation
     message(paste("Mdn Abs Error: +/- ", signif(median(abs((proj_score_diff$predicteds - proj_score_diff$actuals))), digits = 3), ' points', sep=""))
 
-    # MAPE Calculation
-    message(paste("Mean Abs % Error: ", signif(abs(mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))/proj_score_diff$actuals)) * 100, digits = 3), '%', sep=""))
+    # MAPE Calculation -- can't really use this because the actual differentials will all add up to 0
+    # message(paste("Mean Abs % Error: ", signif(abs(mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))/proj_score_diff$actuals)) * 100, digits = 3), '%', sep=""))
 
     # Take projected score diff and calculate win prob
     mu = mean(proj_score_diff$predicteds)
