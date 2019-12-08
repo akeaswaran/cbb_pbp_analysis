@@ -11,7 +11,7 @@ generate_league_pbp <- function(team_ids) {
     message(paste("Staring to load PbP for number of teams: ", length(team_ids), sep = ""))
     for(i in 1:length(team_ids)) {
         name = team_ids[i]
-        if (name != 'Central Arkansas' && name != 'Columbia' && name != 'High Point') {
+        if (name != 'Central Arkansas' && name != 'Columbia' && name != 'High Point' && name != 'Duquesne') {
             message(paste0("[",i,"/",length(team_ids),"]"," Getting PbPs for team: ", name, sep = ""))
             games = get_game_ids(name)
             for(game in games) {
@@ -40,7 +40,7 @@ if (!exists("total")) {
 
 refresh_data <- function(interval) {
     all_teams = dplyr::pull(ids, team)
-    end <- (min(last_team_index+interval - 1, length(all_teams) - 1))
+    end <- (min(last_team_index+interval, length(all_teams) - 1))
     range = last_team_index:end
     dataframe <- generate_league_pbp(all_teams[range])
     last_team_index <<- end
