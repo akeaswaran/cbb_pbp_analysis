@@ -95,7 +95,7 @@ generate_win_prob <- function(espn_game_id) {
     WinProb <- (max(box_score$FFDiff) * metadata[["slope"]]) + metadata[["intercept"]]
     ff_max_team = box_score[which(max(box_score$FFDiff) == box_score$FFDiff)]
     message(paste('FF Max team: ', ff_max_team$Name, sep=""))
-    message(paste('FF Max won by: ', ff_max_team$PointDiff, sep=""))
+    message(paste('Actual Winner: ', box_score[which(max(box_score$Points) == box_score$Points)]$Name, sep=""))
     message(paste('FF Max had four factors rating diff of: ', ff_max_team$FFDiff, sep=""))
     message(paste('FF Max team should have won by: ', WinProb, sep=""))
     message(paste('Proj win prob for FF Max team: ', pnorm(WinProb, mu, std) * 100, '%', sep=""))
