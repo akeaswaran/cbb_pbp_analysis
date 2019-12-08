@@ -1,6 +1,7 @@
 library(ncaahoopR)
 library(stringr)
 library(data.table)
+setwd("~/Documents/Apps/cbb_pbp_analysis")
 source("./adv_box_score.R")
 
 data("ids")
@@ -16,8 +17,8 @@ generate_league_pbp <- function(team_ids) {
             games = get_game_ids(name)
             for(game in games) {
                 box_score = generate_box_score(game_id = game)
-                if (!is.null(box_score)) {
-                    total_df = rbind(total_df, select(box_score, FFDiff, PointDiff))
+                if (!is.null(box_score) && !any(box_score$GameID[0]==total_df$GameID)) {
+                    total_df = rbind(total_df, select(box_score, GameID, FFDiff, PointDiff))
                 }
             }
             message(paste0("[",i,"/",length(team_ids),"]"," Done getting PbPs for team: ", name, sep = ""))
@@ -31,25 +32,36 @@ generate_league_pbp <- function(team_ids) {
 }
 
 if (!exists("last_team_index")) {
-    last_team_index = 1
+    last_team_index = 0
 }
 
 if (!exists("total")) {
     total = data.table()
+    if (file.exists('data/base.csv')) {
+        message(paste0("[Startup] Reading existing model data from local CSV."))
+        total = read.table('data/base.csv')
+    } else {
+        message(paste0("[Startup] Could not find local CSV; will have to load data remotely."))
+    }
+} else {
+    message(paste0("[Startup] 'total' already exists in workspace, skipping file loading."))
 }
 
 refresh_data <- function(interval) {
     all_teams = dplyr::pull(ids, team)
-    end <- (min(last_team_index+interval, length(all_teams) - 1))
-    range = last_team_index:end
+    end <- (min(last_team_index + interval, length(all_teams) - 1))
+    range = (last_team_index + 1):end
+    message(paste0("-----\n","[Data Loading]"," Retrieving ", interval," more teams' worth of game records for model training", sep = ""))
     dataframe <- generate_league_pbp(all_teams[range])
     last_team_index <<- end
     total <<- rbind(total, dataframe)
+    message(paste0("-----\n","[Data Loading]"," Wrote ", length(dataframe$GameID)," new game records to local file", sep = ""))
+    write.csv(total, 'data/base.csv')
 }
 
 refresh_model <- function(should_refresh_data, interval) {
     if (should_refresh_data == TRUE) {
-        refresh_data(interval = intvl)
+        refresh_data(interval = interval)
     }
     message(paste("Correlation: ",cor(total$FFDiff, total$PointDiff),sep=""))
 
