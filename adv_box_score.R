@@ -140,7 +140,7 @@ generate_box_score <- function(game_id, home_team = NULL, away_team = NULL) {
     game_stats$FFDiff <- c(ff_home - ff_away, ff_away - ff_home)
 
     game_stats$PointDiff <- c(selected_team_stats$Points - selected_opponent_stats$Points, selected_opponent_stats$Points - selected_team_stats$Points)
-
+    game_stats$GameID <- c(game_id, game_id)
     return(game_stats)
 }
 
