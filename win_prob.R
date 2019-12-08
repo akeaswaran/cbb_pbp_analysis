@@ -80,13 +80,13 @@ generate_win_prob <- function(espn_game_id) {
     proj_score_diff <- metadata[['proj_scores']]
 
     # MAE calculation
-    message(paste("Mean Abs Error: +/- ", mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))), ' points', sep=""))
+    message(paste("Mean Abs Error: +/- ", signif(mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))), digits = 3), ' points', sep=""))
 
     # MdAE calculation
-    message(paste("Mdn Abs Error: +/- ", median(abs((proj_score_diff$predicteds - proj_score_diff$actuals))), ' points', sep=""))
+    message(paste("Mdn Abs Error: +/- ", signif(median(abs((proj_score_diff$predicteds - proj_score_diff$actuals))), digits = 3), ' points', sep=""))
 
     # MAPE Calculation
-    message(paste("Mean Abs % Error: ", mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))/proj_score_diff$actuals), sep=""))
+    message(paste("Mean Abs % Error: ", signif(abs(mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))/proj_score_diff$actuals)) * 100, digits = 3), '%', sep=""))
 
     # Take projected score diff and calculate win prob
     mu = mean(proj_score_diff$predicteds)
@@ -94,11 +94,12 @@ generate_win_prob <- function(espn_game_id) {
 
     WinProb <- (max(box_score$FFDiff) * metadata[["slope"]]) + metadata[["intercept"]]
     ff_max_team = box_score[which(max(box_score$FFDiff) == box_score$FFDiff)]
-    message(paste('FF Max team: ', ff_max_team$Name, sep=""))
     message(paste('Actual Winner: ', box_score[which(max(box_score$Points) == box_score$Points)]$Name, sep=""))
-    message(paste('FF Max had four factors rating diff of: ', ff_max_team$FFDiff, sep=""))
-    message(paste('FF Max team should have won by: ', WinProb, sep=""))
-    message(paste('Proj win prob for FF Max team: ', pnorm(WinProb, mu, std) * 100, '%', sep=""))
+    message(paste('Actual MOV: ', box_score[which(max(box_score$Points) == box_score$Points)]$PointDiff, sep=""))
+    message(paste('Winner by Four Factors Rating: ', ff_max_team$Name, sep=""))
+    message(paste('Four Factors Rating Margin: ', signif(ff_max_team$FFDiff, digits = 3), sep=""))
+    message(paste(ff_max_team$Name,' projected MOV: ', WinProb, sep=""))
+    message(paste(ff_max_team$Name,' projected post-game win expectancy: ', signif(pnorm(WinProb, mu, std) * 100, digits = 3), '%', sep=""))
 }
 
 # generate_win_prob(espn_game_id = 401168533)
