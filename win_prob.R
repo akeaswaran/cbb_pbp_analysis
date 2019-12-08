@@ -12,7 +12,7 @@ generate_league_pbp <- function(team_ids) {
     message(paste("Staring to load PbP for number of teams: ", length(team_ids), sep = ""))
     for(i in 1:length(team_ids)) {
         name = team_ids[i]
-        if (name != 'Central Arkansas' && name != 'Columbia' && name != 'High Point' && name != 'Duquesne'&& name != 'Lafayette' && name != 'Lehigh') {
+        if (name != 'Central Arkansas' && name != 'Columbia' && name != 'High Point' && name != 'Duquesne'&& name != 'Lafayette' && name != 'Lehigh' && name != 'Monmouth') {
             message(paste0("[",i,"/",length(team_ids),"]"," Getting PbPs for team: ", name, sep = ""))
             games = get_game_ids(name)
             for(game in games) {
@@ -107,6 +107,9 @@ generate_win_prob <- function(espn_game_id) {
     # Take projected score diff and calculate win prob
     mu = mean(proj_score_diff$predicteds)
     std = sd(proj_score_diff$predicteds)
+
+    message(paste0("Projected MOV mean: ", signif(mu, digits = 3)))
+    message(paste0("Projected MOV standard deviation: ", signif(std, digits = 3)))
 
     proj_MOV <- (max(box_score$FFDiff) * metadata[["slope"]]) + metadata[["intercept"]]
     ff_max_team = box_score[which(max(box_score$FFDiff) == box_score$FFDiff)]
