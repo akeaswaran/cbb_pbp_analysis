@@ -104,14 +104,14 @@ generate_win_prob <- function(espn_game_id) {
     mu = mean(proj_score_diff$predicteds)
     std = sd(proj_score_diff$predicteds)
 
-    WinProb <- (max(box_score$FFDiff) * metadata[["slope"]]) + metadata[["intercept"]]
+    proj_MOV <- (max(box_score$FFDiff) * metadata[["slope"]]) + metadata[["intercept"]]
     ff_max_team = box_score[which(max(box_score$FFDiff) == box_score$FFDiff)]
     message(paste('Actual Winner: ', box_score[which(max(box_score$Points) == box_score$Points)]$Name, sep=""))
     message(paste('Actual MOV: ', box_score[which(max(box_score$Points) == box_score$Points)]$PointDiff, sep=""))
     message(paste('Winner by Four Factors Rating: ', ff_max_team$Name, sep=""))
     message(paste('Four Factors Rating Margin: ', signif(ff_max_team$FFDiff, digits = 3), sep=""))
-    message(paste(ff_max_team$Name,' projected MOV: ', WinProb, sep=""))
-    message(paste(ff_max_team$Name,' projected post-game win expectancy: ', signif(pnorm(WinProb, mu, std) * 100, digits = 3), '%', sep=""))
+    message(paste(ff_max_team$Name,' projected MOV: ', signif(proj_MOV, digits = 3), sep=""))
+    message(paste(ff_max_team$Name,' projected post-game win expectancy: ', signif(pnorm(proj_MOV, mu, std) * 100, digits = 3), '%', sep=""))
 }
 
 # generate_win_prob(espn_game_id = 401168533)
