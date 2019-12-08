@@ -11,7 +11,7 @@ generate_league_pbp <- function(team_ids) {
     message(paste("Staring to load PbP for number of teams: ", length(team_ids), sep = ""))
     for(i in 1:length(team_ids)) {
         name = team_ids[i]
-        if (name != 'Central Arkansas' && name != 'Columbia') {
+        if (name != 'Central Arkansas' && name != 'Columbia' && name != 'High Point') {
             message(paste0("[",i,"/",length(team_ids),"]"," Getting PbPs for team: ", name, sep = ""))
             games = get_game_ids(name)
             for(game in games) {
