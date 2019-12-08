@@ -80,13 +80,13 @@ generate_win_prob <- function(espn_game_id) {
     proj_score_diff <- metadata[['proj_scores']]
 
     # MAE calculation
-    message(paste("MAE: ", mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))), sep=""))
+    message(paste("Mean Abs Error: +/- ", mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))), ' points', sep=""))
 
     # MdAE calculation
-    message(paste("MdAE: ", median(abs((proj_score_diff$predicteds - proj_score_diff$actuals))), sep=""))
+    message(paste("Mdn Abs Error: +/- ", median(abs((proj_score_diff$predicteds - proj_score_diff$actuals))), ' points', sep=""))
 
     # MAPE Calculation
-    message(paste("MAPE: ", mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))/proj_score_diff$actuals), sep=""))
+    message(paste("Mean Abs % Error: ", mean(abs((proj_score_diff$predicteds - proj_score_diff$actuals))/proj_score_diff$actuals), sep=""))
 
     # Take projected score diff and calculate win prob
     mu = mean(proj_score_diff$predicteds)
