@@ -43,7 +43,7 @@ if (!exists("total")) {
     total = data.table()
     if (file.exists('data/base.csv')) {
         message(paste0("[Startup] Reading existing model data from local CSV."))
-        total = read.table('data/base.csv')
+        total = read.table('data/base.csv', header = TRUE, sep = ",")
     } else {
         message(paste0("[Startup] Could not find local CSV; will have to load data remotely."))
     }
