@@ -83,6 +83,7 @@ refresh_model <- function(should_refresh_data, interval) {
                                         predicteds = dist_pred))
     message("Correlation of predictions to actual: ")
     print(cor(proj_score_diff))
+    message(paste0("% of data covered by model: " ,summary(linear_model)$r.squared, sep=""))
 
     model_summary <- summary(linear_model)
     model_coeffs <- model_summary$coefficients
