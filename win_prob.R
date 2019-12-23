@@ -113,9 +113,10 @@ generate_win_prob <- function(espn_game_id) {
     message(paste0("Projected MOV standard deviation: ", signif(std, digits = 3)))
 
     proj_MOV <- (max(box_score$FFDiff) * metadata[["slope"]]) + metadata[["intercept"]]
-    ff_max_team = box_score[which(max(box_score$FFDiff) == box_score$FFDiff)]
-    message(paste('Actual Winner: ', box_score[which(max(box_score$Points) == box_score$Points)]$Name, sep=""))
-    message(paste('Actual MOV: ', box_score[which(max(box_score$Points) == box_score$Points)]$PointDiff, sep=""))
+    ff_max_team <- box_score[which(max(box_score$FFDiff) == box_score$FFDiff)]
+    actual_winner <- box_score[which(max(box_score$Points) == box_score$Points)]
+    message(paste('Actual Winner: ', actual_winner$Name, sep=""))
+    message(paste('Actual MOV: ', actual_winner$PointDiff, sep=""))
     message(paste('Winner by Four Factors Rating: ', ff_max_team$Name, sep=""))
     message(paste('Four Factors Rating Margin: ', signif(ff_max_team$FFDiff, digits = 3), sep=""))
     message(paste(ff_max_team$Name,' projected MOV: ', signif(proj_MOV, digits = 3), sep=""))
