@@ -127,7 +127,7 @@ generate_win_prob <- function(espn_game_id) {
 predict_matchup <- function(team1, team2) {
     team1_ids <- get_game_ids(team1)
     team2_ids <- get_game_ids(team2)
-    
+
     container <- data.table()
     for (i in 1:length(team1_ids)) {
         game = team1_ids[i]
@@ -142,7 +142,7 @@ predict_matchup <- function(team1, team2) {
             message(paste0("[",i,"/",length(team1_ids),"]"," Already parsed GameID ",game,", skipping",sep=""))
         }
     }
-    
+
     for (i in 1:length(team2_ids)) {
         game = team2_ids[i]
         message(paste0("[",i,"/",length(team2_ids),"]"," Parsing box score for GameID ",game,sep=""))
@@ -156,10 +156,10 @@ predict_matchup <- function(team1, team2) {
             message(paste0("[",i,"/",length(team2_ids),"]"," Already parsed GameID ",game,", skipping",sep=""))
         }
     }
-    
+
     metadata <- refresh_model(should_refresh_data = FALSE, interval = 50)
     proj_score_diff <- metadata[['proj_scores']]
-    
+
     team1_mu = mean(tail(container[which(container$Name == team1)]$FFSum, 4))
     team2_mu = mean(tail(container[which(container$Name == team2)]$FFSum, 4))
     diff = team1_mu - team2_mu
