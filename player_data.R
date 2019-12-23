@@ -57,7 +57,7 @@ analyze_player_plays <- function(pbp, player, team) {
 
     ft_to_fga <- (nrow(made_fts) / nrow(team_shots))
 
-    opponent <- if (cleaned_team_name$ESPN == last(team_plays$home)) last(team_plays$away) else last(team_plays$home)
+    opponent <- if (cleaned_team_name$ESPN_PBP == last(team_plays$home)) last(team_plays$away) else last(team_plays$home)
 
     table = data.table(
         Name = c(player),

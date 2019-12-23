@@ -53,7 +53,7 @@ analyze_team_plays <- function(team, pbp) {
     # team_pts <- (nrow(made_shots) - nrow(made_3pt)) * 2.0 + nrow(made_3pt) * 3.0 + nrow(made_fts)
 
     last_update <- last(pbp)
-    team_pts <- if (cleaned_team_name$ESPN == last_update$home) last_update$home_score else last_update$away_score
+    team_pts <- if (cleaned_team_name$ESPN_PBP == last_update$home) last_update$home_score else last_update$away_score
 
     true_shooting_pct <- 100 * (team_pts / (2 * (nrow(team_shots) + 0.44 * nrow(team_fts))))
 
