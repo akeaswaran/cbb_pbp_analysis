@@ -65,7 +65,7 @@ analyze_team_plays <- function(team, pbp) {
 
     table = data.table(
         Name = c(team),
-        # plays = nrow(team_plays),
+        Plays = nrow(team_plays),
         Points = team_pts,
         PPS = team_pts / nrow(team_shots),
         Assists = nrow(team_assists),
