@@ -64,7 +64,7 @@ refresh_data <- function(interval) {
 }
 
 refresh_model <- function(should_refresh_data, interval) {
-    if (should_refresh_data == TRUE) {
+    if (should_refresh_data == TRUE || length(total) == 0) {
         refresh_data(interval = interval)
     }
     message(paste("Correlation: ",cor(total$FFDiff, total$PointDiff),sep=""))
@@ -120,7 +120,57 @@ generate_win_prob <- function(espn_game_id) {
     message(paste('Winner by Four Factors Rating: ', ff_max_team$Name, sep=""))
     message(paste('Four Factors Rating Margin: ', signif(ff_max_team$FFDiff, digits = 3), sep=""))
     message(paste(ff_max_team$Name,' projected MOV: ', signif(proj_MOV, digits = 3), sep=""))
-    message(paste(ff_max_team$Name,' projected post-game win expectancy: ', signif(pnorm(proj_MOV, mu, std) * 100, digits = 3), '%', sep=""))
+    win_prob <- pnorm(proj_MOV, mu, std) * 100
+    message(paste(ff_max_team$Name,' projected post-game win expectancy: ', signif(win_prob, digits = 3), '%', sep=""))
+}
+
+predict_matchup <- function(team1, team2) {
+    team1_ids <- get_game_ids(team1)
+    team2_ids <- get_game_ids(team2)
+    
+    container <- data.table()
+    for (i in 1:length(team1_ids)) {
+        game = team1_ids[i]
+        message(paste0("[",i,"/",length(team1_ids),"]"," Parsing box score for GameID ",game,sep=""))
+        if (!any(game==container$GameID)) {
+            box_score = generate_box_score(game_id = game)
+            if (!is.null(box_score)) {
+                tmp = box_score[which(box_score$Name == team1)]
+                container = rbind(container, select(tmp, GameID,Name, FFSum))
+            }
+        } else {
+            message(paste0("[",i,"/",length(team1_ids),"]"," Already parsed GameID ",game,", skipping",sep=""))
+        }
+    }
+    
+    for (i in 1:length(team2_ids)) {
+        game = team2_ids[i]
+        message(paste0("[",i,"/",length(team2_ids),"]"," Parsing box score for GameID ",game,sep=""))
+        if (!any(game==container$GameID)) {
+            box_score = generate_box_score(game_id = game)
+            if (!is.null(box_score)) {
+                tmp = box_score[which(box_score$Name == team2)]
+                container = rbind(container, select(tmp, GameID,Name, FFSum))
+            }
+        } else {
+            message(paste0("[",i,"/",length(team2_ids),"]"," Already parsed GameID ",game,", skipping",sep=""))
+        }
+    }
+    
+    metadata <- refresh_model(should_refresh_data = FALSE, interval = 50)
+    proj_score_diff <- metadata[['proj_scores']]
+    
+    team1_mu = mean(tail(container[which(container$Name == team1)]$FFSum, 4))
+    team2_mu = mean(tail(container[which(container$Name == team2)]$FFSum, 4))
+    diff = team1_mu - team2_mu
+
+    mu = mean(proj_score_diff$predicteds)
+    std = sd(proj_score_diff$predicteds)
+
+    proj_MOV <- (diff * metadata[["slope"]]) + metadata[["intercept"]]
+    win_prob <- pnorm(proj_MOV, mu, std) * 100
+    return(list(win_prob, proj_MOV))
 }
 
 # generate_win_prob(espn_game_id = 401168533)
+predict_matchup("Georgia Tech", "Houston")
