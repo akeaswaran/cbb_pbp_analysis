@@ -121,7 +121,9 @@ generate_player_stat_chart <- function(player, team, stat1, stat1_title, stat2, 
     message(paste("Generating ", stat1, " vs ", stat2, " chart for player: ", player, sep = ""))
     stats <- retrieve_player_game_data(player, team)
     stats[[stat1]] <- factor(stats[[stat1]], levels = stats[[stat1]])
-    ggplot(stats, aes_string(x=stat1, y=stat2, group=1)) + geom_line(color=line_color) + geom_point(color=line_color) + ggtitle(paste0(player," (2019-20)",sep="")) + ylab(stat2_title) + xlab(stat1_title)
+    base = ggplot(stats, aes_string(x=stat1, y=stat2, group=1))
+
+    base + geom_line(color=line_color) + geom_point(color=line_color) + ggtitle(paste0(player," (2019-20)",sep="")) + ylab(stat2_title) + xlab(stat1_title)
 }
 
 generate_player_stat_chart("Michael Devoe", "Georgia Tech", "Opponent","Opponent", "TSP","True Shooting %", "#B3A369")
