@@ -172,5 +172,8 @@ predict_matchup <- function(team1, team2) {
     return(list(win_prob, proj_MOV))
 }
 
+# Example: generate a post-game win probability for ESPN game 401168533: Syracuse 97, Georgia Tech 63
 # generate_win_prob(espn_game_id = 401168533)
-predict_matchup("Georgia Tech", "Houston")
+
+# Example: predict a matchup between Georgia Tech and Houston based on their game-by-game post-game win probabilities
+# predict_matchup("Georgia Tech", "Houston")
