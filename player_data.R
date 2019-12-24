@@ -127,4 +127,4 @@ generate_player_stat_chart <- function(player, team, stat1, stat1_title, stat2, 
 }
 
 # example: Tracking Michael Devoe's TSP% so far in 2019-20
-generate_player_stat_chart("Michael Devoe", "Georgia Tech", "Opponent","Opponent", "TSP","True Shooting %", "#B3A369")
+# generate_player_stat_chart("Michael Devoe", "Georgia Tech", "Opponent","Opponent", "TSP","True Shooting %", "#B3A369")
