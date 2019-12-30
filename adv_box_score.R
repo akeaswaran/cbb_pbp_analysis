@@ -15,7 +15,7 @@ calculate_four_factors_sum <- function(box_row) {
 
     shoot = (shoot_factor * box_row$eFG)
     turnover = (turnover_factor * box_row$TOV)
-    rebound = ((rebound_factor / 2) * box_row$ORB) + ((rebound_factor / 2) * box_row$DRB)
+    rebound = ((rebound_factor / 2) * box_row$ORBP) + ((rebound_factor / 2) * box_row$DRBP)
     fts = (ft_factor * box_row$FTpFGA)
 
     weighted_sum = sum(shoot, turnover, rebound, fts)
