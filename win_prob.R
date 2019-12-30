@@ -59,6 +59,7 @@ refresh_data <- function(interval) {
     dataframe <- generate_league_pbp(all_teams[range])
     last_team_index <<- end
     total <<- rbind(total, dataframe)
+    total <<- na.omit(total)
     message(paste0("-----\n","[Data Loading]"," Wrote ", length(dataframe$GameID)," new game records to local file", sep = ""))
     write.csv(total, 'data/base.csv')
 }
