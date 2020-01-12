@@ -4,7 +4,7 @@ library(data.table)
 data("ids")
 data("dict")
 
-shot_types = c('Jumper','Dunk','Layup','Three Point Jumper')
+shot_types = c('Jumper','Dunk','Layup','Three Point Jumper','Tip Shot')
 rebound_types = c('Defensive Rebound','Offensive Rebound')
 
 calculate_four_factors_sum <- function(box_row) {
