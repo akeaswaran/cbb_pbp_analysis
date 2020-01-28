@@ -136,7 +136,7 @@ predict_matchup <- function(team1, team2) {
         if (!any(game==container$GameID)) {
             box_score = generate_box_score(game_id = game)
             if (!is.null(box_score)) {
-                tmp = box_score[which(box_score$Name == team1)]
+                tmp = box_score #[which(box_score$Name == team1)]
                 container = rbind(container, select(tmp, GameID,Name, FFSum))
             }
         } else {
@@ -150,7 +150,7 @@ predict_matchup <- function(team1, team2) {
         if (!any(game==container$GameID)) {
             box_score = generate_box_score(game_id = game)
             if (!is.null(box_score)) {
-                tmp = box_score[which(box_score$Name == team2)]
+                tmp = box_score #[which(box_score$Name == team2)]
                 container = rbind(container, select(tmp, GameID,Name, FFSum))
             }
         } else {
@@ -161,8 +161,18 @@ predict_matchup <- function(team1, team2) {
     metadata <- refresh_model(should_refresh_data = FALSE, interval = 50)
     proj_score_diff <- metadata[['proj_scores']]
 
-    team1_mu = mean(tail(container[which(container$Name == team1)]$FFSum, 4))
-    team2_mu = mean(tail(container[which(container$Name == team2)]$FFSum, 4))
+    team1_mu = mean(tail(container[(container$Name == team1)]$FFSum, 4))
+    team1_sos = sum(container[(container$GameID %in% team1_ids) & (container$Name != team1)]$FFSum)
+
+    team2_mu = mean(tail(container[(container$Name == team2)]$FFSum, 4))
+    team2_sos = sum(container[(container$GameID %in% team2_ids) & (container$Name != team2)]$FFSum)
+
+    if (team1_sos > team2_sos) {
+        team2_mu = team2_mu * (team2_sos / team1_sos)
+    } else if (team2_sos > team1_sos) {
+        team1_mu = team1_mu * (team1_sos / team2_sos)
+    }
+
     diff = team1_mu - team2_mu
 
     mu = mean(proj_score_diff$predicteds)
