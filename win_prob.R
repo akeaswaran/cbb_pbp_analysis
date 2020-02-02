@@ -43,7 +43,7 @@ if (!exists("total")) {
     total = data.table()
     if (file.exists('data/base.csv')) {
         message(paste0("[Startup] Reading existing model data from local CSV."))
-        total = read.table('data/base.csv', header = TRUE, sep = ",")
+        total = read.table('data/base.csv', header = TRUE, row.names = NULL, sep = ",")
     } else {
         message(paste0("[Startup] Could not find local CSV; will have to load data remotely."))
     }
@@ -61,7 +61,7 @@ refresh_data <- function(interval) {
     total <<- rbind(total, dataframe)
     total <<- na.omit(total)
     message(paste0("-----\n","[Data Loading]"," Wrote ", length(dataframe$GameID)," new game records to local file", sep = ""))
-    write.csv(total, 'data/base.csv')
+    write.csv(total, 'data/base.csv', row.names = FALSE)
 }
 
 refresh_model <- function(should_refresh_data, interval) {
